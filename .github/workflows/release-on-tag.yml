@@ -1,0 +1,35 @@
+name: Build and Release EDM Tools
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create addon zip (excluding GitHub files)
+        run: |
+          TAG="${{ github.ref_name }}"
+          ZIP="EDM_TOOLS_${TAG}.zip"
+
+          zip -r "$ZIP" . \
+            -x ".git/*" \
+               ".github/*" \
+               ".gitignore" \
+               ".gitattributes"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: EDM Tools ${{ github.ref_name }}
+          files: EDM_TOOLS_${{ github.ref_name }}.zip
