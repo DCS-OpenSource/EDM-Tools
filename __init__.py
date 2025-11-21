@@ -1,7 +1,7 @@
 bl_info = {
     "name": "EDM Tools",
     "author": "Caffeine Simulations",
-    "version": (2, 1, 0),
+    "version": (1, 0, 0),
     "blender": (4, 5, 0),
     "location": "3D Viewport > Sidebar (N) > EDM Tools",
     "description": "EDM Helper Tools for DCS World Blender Export",
