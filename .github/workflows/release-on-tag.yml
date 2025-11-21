@@ -33,3 +33,4 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: EDM Tools ${{ github.ref_name }}
           files: EDM_TOOLS_${{ github.ref_name }}.zip
+          body_path: CHANGELOG.md
