@@ -47,12 +47,26 @@ def filter_pose_bones(context, arm_obj, props):
         bones = [pb for pb in bones if pb.bone.use_deform]
     return bones
 
-def make_controls_collection(context, name="EDM_ArmatureCtrls"):
-    coll = bpy.data.collections.get(name)
+def make_controls_collection_for_armature(context, arm_obj):
+    # Choose a "base" collection: wherever the armature lives
+    if arm_obj.users_collection:
+        base_coll = arm_obj.users_collection[0]
+    else:
+        base_coll = context.scene.collection
+
+    coll_name = f"EDM_ArmatureCtrls_{arm_obj.name}"
+
+    coll = bpy.data.collections.get(coll_name)
     if coll is None:
-        coll = bpy.data.collections.new(name)
-        context.scene.collection.children.link(coll)
+        coll = bpy.data.collections.new(coll_name)
+        base_coll.children.link(coll)
+    else:
+        # Ensure it's at least linked under the same base collection
+        if coll not in base_coll.children:
+            base_coll.children.link(coll)
+
     return coll
+
 
 def bone_name_from_empty_name(arm_obj, empty_obj):
     p = f"CTRL_{arm_obj.name}_"
@@ -105,7 +119,7 @@ class EDMTOOLS_OT_bake_empties_from_armature(bpy.types.Operator):
             self.report({'WARNING'}, "No bones to process")
             return {'CANCELLED'}
 
-        coll = make_controls_collection(context) if props.create_parent_collection else None
+        coll = make_controls_collection_for_armature(context, arm) if props.create_parent_collection else None
         pairs = []  # (pbone, empty)
         for pbone in bones:
             e = get_or_create_empty_for_bone(context, arm, pbone, coll)
@@ -221,6 +235,28 @@ class EDMTOOLS_OT_revert_bake(bpy.types.Operator):
         for a in actions:
             if a.users == 0:
                 bpy.data.actions.remove(a, do_unlink=True)
+
+        coll_name = f"EDM_ArmatureCtrls_{arm.name}"
+        coll = bpy.data.collections.get(coll_name)
+        if coll:
+            # only remove if it's now empty (no objects, no child collections)
+            if not coll.objects and not coll.children:
+                # Unlink from Scene Collection if present
+                sc_children = context.scene.collection.children
+                for child in list(sc_children):
+                    if child == coll:
+                        sc_children.unlink(coll)
+                        break
+
+                # Unlink from any other parent collections
+                for parent in bpy.data.collections:
+                    for child in list(parent.children):
+                        if child == coll:
+                            parent.children.unlink(coll)
+                            break
+
+                # Finally remove the collection datablock
+                bpy.data.collections.remove(coll)
 
         self.report({'INFO'}, f"Reverted bake for '{arm.name}' ({len(empties)} empties removed)")
         return {'FINISHED'}
