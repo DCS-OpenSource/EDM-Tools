@@ -1,6 +1,7 @@
-## Version 0.2.0
+## Version 1.0.0
 
-Inital Build Test of the EDM Tools Plugin
+Inital Release of the EDM Tools Plugin. Currently consisting of just of the armature bake tool. More tools are planned in future.
 
 ## Changelog:
-* Added Release Compiler
+* Added Modular Tool Loader
+* Added Armature Baker
