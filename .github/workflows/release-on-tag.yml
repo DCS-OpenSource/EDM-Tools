@@ -16,16 +16,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create addon zip (excluding GitHub files)
+      - name: Create addon zip with edm_tools package
         run: |
           TAG="${{ github.ref_name }}"
           ZIP="EDM_TOOLS_${TAG}.zip"
 
-          zip -r "$ZIP" . \
-            -x ".git/*" \
-               ".github/*" \
-               ".gitignore" \
-               ".gitattributes"
+          # Make a staging directory
+          mkdir -p dist/edm_tools
+
+          # Copy addon files into edm_tools/ (adjust if you add more later)
+          cp __init__.py dist/edm_tools/
+          cp -r modules dist/edm_tools/
+
+          # If you want CHANGELOG inside the addon too:
+          # cp CHANGELOG.md dist/edm_tools/
+
+          # Create the zip with edm_tools/ as the top-level folder
+          cd dist
+          zip -r "../$ZIP" edm_tools
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

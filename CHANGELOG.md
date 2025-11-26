@@ -1,7 +1,4 @@
-## Version 1.0.0
-
-Inital Release of the EDM Tools Plugin. Currently consisting of just of the armature bake tool. More tools are planned in future.
+Please download and install the `EDM_TOOLS_vx.x.x.zip`, **Not** the `Source code (zip)` for the plugin to install correctly
 
 ## Changelog:
-* Added Modular Tool Loader
-* Added Armature Baker
+* **Fixed:** Plugin now installs correctly from .zip download
