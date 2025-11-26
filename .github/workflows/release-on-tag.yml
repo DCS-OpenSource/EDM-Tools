@@ -16,6 +16,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Update bl_info version from tag
+        env:
+          TAG: ${{ github.ref_name }}   # e.g. v1.0.0
+        run: |
+          python << 'PY'
+          import os, re
+          from pathlib import Path
+
+          tag = os.environ["TAG"]          # e.g. v1.0.0
+          if tag.startswith("v"):
+              tag = tag[1:]
+          parts = tag.split(".")
+          if len(parts) != 3:
+              raise SystemExit(f"Unexpected tag format: {tag!r}, expected vMAJOR.MINOR.PATCH")
+
+          version_tuple = f"({parts[0]}, {parts[1]}, {parts[2]})"
+          path = Path("__init__.py")
+          text = path.read_text(encoding="utf8")
+
+          # Replace: "version": (1, 0, 0)
+          new_text, count = re.subn(
+              r'("version"\s*:\s*)\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)',
+              rf'\1{version_tuple}',
+              text,
+          )
+          if count == 0:
+              raise SystemExit("Did not find a bl_info version tuple to replace")
+
+          path.write_text(new_text, encoding="utf8")
+          print(f"Updated bl_info version to {version_tuple}")
+          PY
+
       - name: Create addon zip with edm_tools package
         run: |
           TAG="${{ github.ref_name }}"
@@ -24,11 +56,11 @@ jobs:
           # Make a staging directory
           mkdir -p dist/edm_tools
 
-          # Copy addon files into edm_tools/ (adjust if you add more later)
+          # Copy addon files into edm_tools/
           cp __init__.py dist/edm_tools/
           cp -r modules dist/edm_tools/
 
-          # If you want CHANGELOG inside the addon too:
+          # Optional: copy changelog into the addon folder too
           # cp CHANGELOG.md dist/edm_tools/
 
           # Create the zip with edm_tools/ as the top-level folder
