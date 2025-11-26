@@ -33,7 +33,21 @@ def get_or_create_empty_for_bone(context, arm_obj, pbone, coll=None):
     return empty
 
 def bone_is_visible(arm_obj, pbone):
-    return any(a and b for a, b in zip(arm_obj.data.layers, pbone.bone.layers))
+    """Cross-version bone visibility check for Blender 4.x and older."""
+    bone = pbone.bone
+
+    # Bone hidden?
+    if getattr(bone, "hide", False):
+        return False
+    if getattr(bone, "hide_viewport", False):
+        return False
+
+    # Armature hidden?
+    if getattr(arm_obj, "hide_viewport", False):
+        return False
+
+    return True
+
 
 def filter_pose_bones(context, arm_obj, props):
     pbs = list(arm_obj.pose.bones)
