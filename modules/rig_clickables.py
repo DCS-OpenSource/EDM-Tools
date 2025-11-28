@@ -27,8 +27,8 @@ def get_clickables_collection(context):
         coll = bpy.data.collections.new("CLICKABLES")
         scene_coll.children.link(coll)
     else:
-        # Make sure it's linked under the Scene Collection
-        if coll not in scene_coll.children:
+        # Make sure it's linked under the Scene Collection (check by name)
+        if coll.name not in scene_coll.children:
             scene_coll.children.link(coll)
 
     return coll
@@ -80,6 +80,24 @@ def parent_keep_transform(child, parent, context):
         if o.name in context.view_layer.objects:
             o.select_set(True)
     view_layer.objects.active = prev_active
+
+
+def set_edm_special_type(obj, enum_key: str):
+    """
+    Safely set ED exporter SPECIAL_TYPE on an object, if EDMProps is available.
+    enum_key must be one of EDMPropsGroup.SPECIAL_TYPE items, e.g. 'CONNECTOR'.
+    """
+    edm_props = getattr(obj, "EDMProps", None)
+    if edm_props is None:
+        return
+    if not hasattr(edm_props, "SPECIAL_TYPE"):
+        return
+
+    try:
+        edm_props.SPECIAL_TYPE = enum_key
+    except Exception:
+        # If the enum key is invalid for some reason, just skip
+        pass
 
 
 # ---------------- Properties ----------------
@@ -144,6 +162,15 @@ class EDMTOOLS_OT_rig_clickable(bpy.types.Operator):
         return obj is not None and obj.type in {"MESH", "CURVE", "SURFACE", "FONT", "META"}
 
     def execute(self, context):
+        # ---- Check if ED EDM exporter is installed ----
+        if not hasattr(bpy.types.Object, "EDMProps"):
+            self.report(
+                {'ERROR'},
+                "The Eagle Dynamics EDM Exporter addon is not installed or not enabled.\n"
+                "This tool requires the official ED EDM Exporter."
+            )
+            return {'CANCELLED'}
+
         scene = context.scene
         props = scene.edm_tools_rig_clickables
         obj   = context.active_object
@@ -226,6 +253,10 @@ class EDMTOOLS_OT_rig_clickable(bpy.types.Operator):
 
         collection.objects.link(box_empty)
 
+        # ---------------- ED Exporter integration ----------------
+        # After all box setup is done, mark it as a CONNECTOR for EDM exporter
+        set_edm_special_type(box_empty, "CONNECTOR")
+
         # ---------------- Parenting with KEEP TRANSFORM ----------------
         original_parent = obj.parent
 
@@ -246,7 +277,8 @@ class EDMTOOLS_OT_rig_clickable(bpy.types.Operator):
 
         self.report(
             {'INFO'},
-            f"Rigged clickable: Empty '{anim_empty.name}', Box '{box_empty.name}', Action '{action.name}'"
+            f"Rigged clickable: Empty '{anim_empty.name}', Box '{box_empty.name}', "
+            f"Action '{action.name}', ED type set to CONNECTOR"
         )
         return {'FINISHED'}
 
