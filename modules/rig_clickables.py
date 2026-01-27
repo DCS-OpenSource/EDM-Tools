@@ -194,6 +194,7 @@ class EDMTOOLS_OT_rig_clickable(bpy.types.Operator):
         anim_empty_name = f"{obj.name}_CTRL"
         anim_empty = bpy.data.objects.new(anim_empty_name, None)
         anim_empty.empty_display_type = 'PLAIN_AXES'
+        anim_empty.rotation_mode = 'QUATERNION'
         anim_empty.empty_display_size = props.anim_empty_size
 
         if props.copy_object_rotation:
