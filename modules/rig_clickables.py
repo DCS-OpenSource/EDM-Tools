@@ -357,7 +357,7 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         layout.separator()
 
         box = layout.box()
-        box.label(text="Lock Rotation Axes")
+        box.label(text="Connector Lock Rotation Axes")
 
         row = box.row(align=True)
         row.prop(props, "lock_rot_x", toggle=True)
