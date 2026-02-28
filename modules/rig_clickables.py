@@ -324,23 +324,30 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
             icon='MESH_CUBE' if obj and obj.type == 'MESH' else 'OBJECT_DATA'
         )
 
-        # Arg number + name on one line
-        col = layout.column(align=True)
-        col.label(text="Arg Settings:")
+        box = layout.box()
+
+        col = box.column(align=True)
+
+        header = col.row()
+        header.scale_y = 1.2
+        header.label(text="Animation Settings:", icon='DRIVER')
+
         row = col.row(align=True)
         row.prop(props, "arg_number", text="Arg")
-        row.prop(props, "arg_name", text="Name")
+        row.prop(props, "arg_name", text=" Name")
 
         # Some space above the size slider
         col.separator()
         col.prop(props, "anim_empty_size", text="Anim Empty Size")
 
-        layout.separator()
-
         # Box naming with default preview
-        col = layout.column(align=True)
-        col.label(text="Box Empty:")
-        col.prop(props, "box_name", text="Name Override")
+        box = layout.box()
+
+        col = box.column(align=True)
+
+        header = col.row()
+        header.scale_y = 1.2
+        header.label(text="Clickable Empty Settings:", icon='EMPTY_DATA')
 
         default_preview = f"PNT-{props.arg_number}"
         if props.box_name.strip():
@@ -348,24 +355,29 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         else:
             col.label(text=f"Default name: {default_preview}")
 
-        layout.separator()
+        col.label(text="Default Name Override:")
+        col.prop(props, "box_name", text="")
 
-        col = layout.column(align=True)
+        col.separator(type='LINE', factor=2)
+
+        header = col.row()
+        header.scale_y = 1.1
+        header.label(text="Connector Properties", icon='CONSTRAINT')
+
         col.prop(props, "copy_object_rotation")
         col.prop(props, "match_box_bounds")
 
-        layout.separator()
+        col.separator(type='LINE', factor=2)
 
-        box = layout.box()
-        box.label(text="Connector Lock Rotation Axes")
+        header = col.row()
+        header.scale_y = 1.1
+        header.label(text="Connector Lock Rotation Axes:", icon='CONSTRAINT')
 
-        row = box.row(align=True)
+        row = col.row(align=True)
         row.prop(props, "lock_rot_x", toggle=True)
         row.prop(props, "lock_rot_y", toggle=True)
         row.prop(props, "lock_rot_z", toggle=True)
 
-
-        layout.separator()
         layout.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
 
 
