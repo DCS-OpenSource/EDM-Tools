@@ -111,20 +111,38 @@ class EDMToolsRigClickablesProps(bpy.types.PropertyGroup):
         default=0,
         min=0,
         max=65535,
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
 
     arg_name: StringProperty(
         name="Name",
         description="Label for this arg (e.g. Canopy, Batt_SW)",
         default="",
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
 
     box_name: StringProperty(
         name="Box Name Override",
         description="Optional custom clickable box empty name. "
                     "If blank, defaults to 'PNT-<arg number>'.",
         default="",
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
+    
+    lock_rot_x: BoolProperty(
+        name="X",
+        description="Lock X rotation",
+        default=True
+    ) # pyright: ignore[reportInvalidTypeForm]
+
+    lock_rot_y: BoolProperty(
+        name="Y",
+        description="Lock Y rotation",
+        default=False
+    ) # pyright: ignore[reportInvalidTypeForm]
+
+    lock_rot_z: BoolProperty(
+        name="Z",
+        description="Lock Z rotation",
+        default=True
+    ) # pyright: ignore[reportInvalidTypeForm]
 
     anim_empty_size: FloatProperty(
         name="Anim Empty Size",
@@ -133,19 +151,19 @@ class EDMToolsRigClickablesProps(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         subtype='FACTOR',
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
 
     copy_object_rotation: BoolProperty(
         name="Match Object Rotation",
         description="Align the animation empty rotation to the active object",
         default=True,      # checked by default
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
 
     match_box_bounds: BoolProperty(
         name="Match Mesh Bounds",
         description="Roughly size the box empty to the active object's bounding box",
         default=True,      # checked by default
-    )
+    ) # pyright: ignore[reportInvalidTypeForm]
 
 
 # ---------------- Operator ----------------
@@ -236,9 +254,10 @@ class EDMTOOLS_OT_rig_clickable(bpy.types.Operator):
         # Set the box empty's pivot to the geometry center
         box_empty.matrix_world.translation = center_world
 
-        # Only allow rotation in Y axis
-        box_empty.lock_rotation[0] = True  # X
-        box_empty.lock_rotation[2] = True  # Z
+        # Apply rotation locks from UI selection
+        box_empty.lock_rotation[0] = props.lock_rot_x
+        box_empty.lock_rotation[1] = props.lock_rot_y
+        box_empty.lock_rotation[2] = props.lock_rot_z
 
         # Optionally, roughly match the mesh bounds with per-axis scale
         if props.match_box_bounds and obj.type == 'MESH':
@@ -336,7 +355,18 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         col.prop(props, "match_box_bounds")
 
         layout.separator()
-        col.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
+
+        box = layout.box()
+        box.label(text="Connector Lock Rotation Axes")
+
+        row = box.row(align=True)
+        row.prop(props, "lock_rot_x", toggle=True)
+        row.prop(props, "lock_rot_y", toggle=True)
+        row.prop(props, "lock_rot_z", toggle=True)
+
+
+        layout.separator()
+        layout.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
 
 
 # ---------------- Register ----------------
