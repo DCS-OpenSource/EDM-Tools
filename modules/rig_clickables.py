@@ -318,66 +318,96 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         scene  = context.scene
         props  = scene.edm_tools_rig_clickables
         obj    = context.active_object
-
+    
+        # ------------------------------------------------------------
+        # Active Object Display
+        # Shows which object will be rigged.
+        # ------------------------------------------------------------
         layout.label(
             text=f"Active Object: {obj.name if obj else 'None'}",
             icon='MESH_CUBE' if obj and obj.type == 'MESH' else 'OBJECT_DATA'
         )
-
+    
+        # ============================================================
+        # Animation Settings Section
+        # Handles draw-arg metadata and animation empty sizing.
+        # ============================================================
         box = layout.box()
-
         col = box.column(align=True)
-
+    
+        # Section header
         header = col.row()
         header.scale_y = 1.2
         header.label(text="Animation Settings:", icon='DRIVER')
-
+    
+        # Arg number + name (used for action naming and metadata)
         row = col.row(align=True)
         row.prop(props, "arg_number", text="Arg")
         row.prop(props, "arg_name", text=" Name")
-
-        # Some space above the size slider
+    
+        # Animation control empty display size
         col.separator()
         col.prop(props, "anim_empty_size", text="Anim Empty Size")
-
-        # Box naming with default preview
+    
+        # ============================================================
+        # Clickable Empty Settings Section
+        # Controls naming and connector behavior for the box empty.
+        # ============================================================
         box = layout.box()
-
         col = box.column(align=True)
-
+    
+        # Section header
         header = col.row()
         header.scale_y = 1.2
         header.label(text="Clickable Empty Settings:", icon='EMPTY_DATA')
-
+    
+        # Display effective/default connector name
         default_preview = f"PNT-{props.arg_number}"
         if props.box_name.strip():
             col.label(text=f"Effective name: {props.box_name}")
         else:
             col.label(text=f"Default name: {default_preview}")
-
+    
+        # Optional name override
         col.label(text="Default Name Override:")
         col.prop(props, "box_name", text="")
-
+    
+        # Divider between naming and connector behavior
         col.separator(type='LINE', factor=2)
-
+    
+        # ============================================================
+        # Connector Properties
+        # Controls how the connector aligns and scales relative
+        # to the active mesh.
+        # ============================================================
         header = col.row()
         header.scale_y = 1.1
         header.label(text="Connector Properties", icon='CONSTRAINT')
-
+    
         col.prop(props, "copy_object_rotation")
         col.prop(props, "match_box_bounds")
-
+    
+        # Divider before rotation lock controls
         col.separator(type='LINE', factor=2)
-
+    
+        # ============================================================
+        # Rotation Lock Controls
+        # Determines which rotation axes are locked on the connector.
+        # Multiple axes can be locked simultaneously.
+        # ============================================================
         header = col.row()
         header.scale_y = 1.1
         header.label(text="Connector Lock Rotation Axes:", icon='CONSTRAINT')
-
+    
         row = col.row(align=True)
         row.prop(props, "lock_rot_x", toggle=True)
         row.prop(props, "lock_rot_y", toggle=True)
         row.prop(props, "lock_rot_z", toggle=True)
-
+    
+        # ============================================================
+        # Execute Operator Button
+        # Creates the clickable rig based on the above settings.
+        # ============================================================
         layout.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
 
 
