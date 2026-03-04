@@ -288,11 +288,6 @@ class EDMTOOLS_PT_nla_panel(bpy.types.Panel):
         box = layout.box()
         col = box.column(align=True)
 
-        col.label(
-            text="Make DCS Ready: ",
-            # icon='NLA'
-        )
-
         col.operator("edmtools.bake_nla", icon='ACTION')
         col.operator("edmtools.unbake_nla", icon='TRASH')
 

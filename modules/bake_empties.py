@@ -98,6 +98,8 @@ class EDMToolsBakeProps(bpy.types.PropertyGroup):
     only_deform: BoolProperty(default=True)
     only_selected_bones: BoolProperty(default=False)
 
+    show_general_settings: bpy.props.BoolProperty(default=False)
+
     frame_start: IntProperty(name="Start", default=0)
     frame_end:   IntProperty(name="End",   default=200)
 
@@ -289,35 +291,75 @@ class EDMTOOLS_PT_bake_subpanel(bpy.types.Panel):
         props = context.scene.edm_tools_bake
         layout = self.layout
         arm = get_active_armature(context)
-        layout.label(text=f"Active Armature: {arm.name if arm else 'None'}")
 
-        col = layout.column(align=True)
-        col.label(text="Bone Filter:")
-        col.prop(props, "which_bones", text="")
+        # Active Armature Box
+        box = layout.box()
+        col = box.column(align=True)
 
-        col.separator()
-        col.label(text="Bake Range:")
-        r = col.row(align=True)
-        r.prop(props, "frame_start")
-        r.prop(props, "frame_end")
+        col.label(text=f"Active Armature: {arm.name if arm else 'None'}", icon='ARMATURE_DATA')
 
-        col.separator()
+        # ------------------------
+        # General Settings (Dropdown)
+        # ------------------------
+
+        box = layout.box()
+        col = box.column(align=True)
+
+        row = col.row()
+        row.prop(
+            props,
+            "show_general_settings",
+            text="General Settings",
+            icon="TRIA_DOWN" if props.show_general_settings else "TRIA_RIGHT",
+            emboss=False
+        )
+
+        if props.show_general_settings:
+
+            col.prop(props, "create_parent_collection")
+            col.prop(props, "do_reparent")
+
+            col.separator(type='LINE', factor=2)
+
+            col.label(text="Bone Filter:")
+            col.prop(props, "which_bones", text="")
+
+            col.separator()
+            col.label(text="Bake Range:")
+
+            r = col.row(align=True)
+            r.prop(props, "frame_start")
+            r.prop(props, "frame_end")
+
+        # ------------------------
+        # Animation Settings (Always Visible)
+        # ------------------------
+
+        box = layout.box()
+        col = box.column(align=True)
+
+        header = col.row()
+        header.scale_y = 1.2
+        header.label(text="Animation Settings:", icon='ACTION')
+
         col.label(text="Action Naming:")
         r2 = col.row(align=True)
         r2.prop(props, "action_number")
         r2.prop(props, "action_name")
 
         col.separator()
+
         row = col.row(align=True)
         row.label(text="Empty Size:")
         row.prop(props, "empty_size", text="")
 
+        # ------------------------
+        # Operators
+        # ------------------------
 
-        col.separator()
-        col.prop(props, "create_parent_collection")
-        col.prop(props, "do_reparent")
+        box = layout.box()
+        col = box.column(align=True)
 
-        col.separator()
         col.operator(EDMTOOLS_OT_bake_empties_from_armature.bl_idname, icon='ACTION')
         col.operator(EDMTOOLS_OT_revert_bake.bl_idname, icon='TRASH')
 

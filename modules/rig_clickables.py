@@ -323,7 +323,10 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         # Active Object Display
         # Shows which object will be rigged.
         # ------------------------------------------------------------
-        layout.label(
+        box = layout.box()
+        col = box.column(align=True)
+
+        col.label(
             text=f"Active Object: {obj.name if obj else 'None'}",
             icon='MESH_CUBE' if obj and obj.type == 'MESH' else 'OBJECT_DATA'
         )
@@ -408,7 +411,10 @@ class EDMTOOLS_PT_rig_clickables_subpanel(bpy.types.Panel):
         # Execute Operator Button
         # Creates the clickable rig based on the above settings.
         # ============================================================
-        layout.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
+        box = layout.box()
+        col = box.column(align=True)
+
+        col.operator(EDMTOOLS_OT_rig_clickable.bl_idname, icon='CONSTRAINT')
 
 
 # ---------------- Register ----------------
