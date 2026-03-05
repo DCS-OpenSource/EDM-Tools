@@ -255,7 +255,7 @@ class EDMTOOLS_OT_unbake_nla(bpy.types.Operator):
 
 class EDMTOOLS_PT_nla_panel(bpy.types.Panel):
 
-    bl_label = "Bake NLA Animations"
+    bl_label = "Bake NLA Animations (INOP)"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "EDM Tools"

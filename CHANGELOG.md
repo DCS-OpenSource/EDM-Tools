@@ -8,4 +8,5 @@ Added Rig Objects Module for gauges etc
 
 ## Changelog:
 * **Added** Rig Objects Module for gauges etc
+* **Removed** NLA Baker, doesn't work, need new approach
 
