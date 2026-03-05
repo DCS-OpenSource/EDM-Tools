@@ -2,10 +2,10 @@ Please download and install the `EDM_TOOLS_vx.x.x.zip`, **Not** the `Source code
 
 ---
 
-Added Armature Baker for skin nodes with NLA.
+Added Rig Objects Module for gauges etc
 
 ---
 
 ## Changelog:
-* **Added** Armature Baker for Skin Animations
-* **Fixed** Formatting is now consistent across all modules
+* **Added** Rig Objects Module for gauges etc
+
